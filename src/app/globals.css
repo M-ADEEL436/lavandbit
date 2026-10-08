@@ -1,26 +1,187 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ============================================================
+   Lavandbit design tokens
+
+   Direction: navy and slate, in a restrained institutional
+   register. Light-first marketing surface, with one dark
+   section carrying the product story. One committed look
+   rather than a light and a dark theme, because a financial
+   site reads as one brand or as none.
+   ============================================================ */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-google-sans);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-ibm-plex-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@theme {
+  /* surfaces */
+  --color-canvas: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-surface-2: #eff2f6;
+  --color-ink-panel: #0a1623;
+  --color-ink-panel-2: #122132;
+  --color-ink-panel-line: #22374f;
+
+  /* text */
+  --color-ink: #0e1621;
+  --color-ink-2: #414e5e;
+  --color-ink-3: #6e7b8b;
+  --color-inverse: #e9eff6;
+  --color-inverse-2: #9dadbf;
+  --color-inverse-3: #6d7f92;
+
+  /* lines */
+  --color-line: #dce2ea;
+  --color-line-soft: #eaeef4;
+
+  /* brand */
+  --color-brand: #14406b;
+  --color-brand-strong: #0d2d4d;
+  --color-brand-soft: #e6eef7;
+  --color-brand-bright: #6ba6dd;
+
+  /* semantic */
+  --color-signal: #8a5a0c;
+  --color-signal-soft: #fbf3e4;
+  --color-danger: #9e3a31;
+  --color-danger-soft: #fbeceb;
+
+  /* shape */
+  --radius-card: 12px;
+  --radius-control: 8px;
+
+  /* type scale */
+  /* Sized so the homepage H1 wraps to three balanced lines rather than four.
+     Four lines at 4rem pushed the hero past the fold and split the main
+     keyword phrase across a line break.
+
+     ⚠️  Use these as `text-display` / `text-h2` / `text-h3`, never as
+     `text-[length:var(--text-h2)]`. The paired `--line-height` only comes
+     along with the named utility; the arbitrary-length form sets font-size
+     alone and leaves the heading on the inherited 1.5, which is how every
+     heading on the site ended up with roughly a third more leading than
+     designed. The hero h1 rendered 44px/66px instead of 44px/48.4px. */
+  --text-display: clamp(1.9rem, 3.5vw, 2.75rem);
+  --text-display--line-height: 1.1;
+  --text-h2: clamp(1.7rem, 3.8vw, 2.5rem);
+  --text-h2--line-height: 1.12;
+  --text-h3: clamp(1.15rem, 1.9vw, 1.4rem);
+  --text-h3--line-height: 1.25;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink-2);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+    /* Every word capitalised, at the client's request, to match the hero.
+       Applied here rather than rewritten into the content strings so the
+       style stays in one place and can be reversed in one line. It leaves
+       words that are already mixed case alone, so "Lavandbit", "ASX" and
+       "AI" are unaffected. Only semantic headings get this, not the
+       font-display marks elsewhere: the payment wordmarks include a
+       deliberately lowercase "wise", and the logo must not be touched. */
+    text-transform: capitalize;
+  }
+
+  /* The browser's own stylesheet sets `text-transform: none` on form controls,
+     and that beats inheritance, so a heading whose text lives inside a button
+     does not pick the transform up. The FAQ accordion is built that way: its
+     questions are headings wrapped in a button, and they stayed sentence case
+     while every other heading changed. */
+  h1 button,
+  h2 button,
+  h3 button,
+  h4 button {
+    text-transform: inherit;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  /* Numerals line up wherever we show figures. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Page container. 67.5rem (1080px). It went 76 -> 84rem earlier because 76
+   read as narrow at 1920px, then 84 -> 75 -> 67.5 at the client's request:
+   the wide version filled a 1440px laptop almost edge to edge, which is the
+   screen size that actually matters, and they asked for more margin twice.
+   At 1080 the gap is 180px a side at 1440px and 420px at 1920px.
+
+   1080 rather than anything narrower because the capability grid in the
+   trust bar needs 113.7px cells and starts wrapping its labels below that.
+   See the note in TrustBar.tsx, which is where the other half of this
+   decision lives.
+
+   Note for body copy: headings and intros cap their own measure, but the
+   article body does not. It fills its column, which is 808px wide on a
+   1440px screen, or roughly 100 characters a line against the 60-75 that
+   reads comfortably. Narrowing the container from 1344 to 1200 took that
+   down from 952px, so this change helped, but it did not finish the job. */
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 67.5rem;
+  padding-inline: 1.25rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 2rem;
+  }
+
+  @media (width >= 90rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Mono eyebrow label used to open most sections. */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
