@@ -40,9 +40,12 @@ const inter = Inter({
   display: "swap",
 });
 
+/* 400 and 500 only. 600 was shipping a file nobody used: the single place
+   the mono face takes a weight is font-medium (500) on the step numbers in
+   how-it-works, and no rule anywhere asks for semibold mono. */
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
   variable: "--font-ibm-plex-mono",
   display: "swap",
 });

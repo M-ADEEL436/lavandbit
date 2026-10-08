@@ -130,6 +130,10 @@
     text-transform: inherit;
   }
 
+  /* text-wrap: pretty was measured against a 4x-throttled mobile CPU to see
+     whether it was behind the time spent in layout. It was not: removing both
+     this and text-wrap: balance left layout time unchanged at about 1.5s, so
+     both were put back rather than paying for a change that bought nothing. */
   p {
     text-wrap: pretty;
   }
